@@ -11,7 +11,7 @@ class MatchupTable extends React.Component{
         let awscores = matchup.scores.away;
         let hoscores = matchup.scores.home;
         return (
-            <li>
+            <div className="col-md-4">
                 <h5>{moment(matchup.game_date).format('ddd MMM DD, YYYY')}</h5>
                 <table className="table">
                 <thead>
@@ -46,7 +46,7 @@ class MatchupTable extends React.Component{
                 </tr>
                 </tbody>
                 </table>
-            </li>
+            </div>
         );
     }
 }

@@ -10,7 +10,10 @@ const huddledb = require('./huddledb');
 const ScrapeyCacheModel = require('./models/scrapeycache.model');
 
 //const NFLTeamStandingsConf = require('./config/scrapey/nflteamstandings.scrapey.conf');
-const NFLScoresConf = require('./config/scrapey/nflscores.scrapey');
+//const NFLScoresConf = require('./config/scrapey/nflscores.scrapey');
+//const NFLTeamRosterConf = require('./config/scrapey/nflteamroster.scrapey');
+//const FiveThirtyEightConf = require('./config/scrapey/fivethirtyeight.scrapey');
+const NFLTeamStatsConf = require('./config/scrapey/nflteamstats.scrapey');
 
 
 const jquery_url = "https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js";
@@ -34,15 +37,39 @@ class Scrapey{
             var these_settings = settings['toscrape'][section_name];
             var this_parser = settings['parser'];
 
-            if(these_settings.hasOwnProperty('iteration_vars')){
-                // Iterate over a url
-                self.scrapeIterate(section_name, these_settings, this_parser);
-                huddledb.disconnect();
+            if(these_settings.hasOwnProperty('dbsource')){
+                self.ammendDatabaseColumn(these_settings).then(function(){
+                    // Iterate over the url with the new array data from the db
+                    self.scrapeIterate(section_name, these_settings, this_parser);
+                }); 
             } else {
-                self.scrapeSingle(settings, section_name);
+                // Just do a vanilla scrape
+
+                if(these_settings.hasOwnProperty('iteration_vars')){
+                    // Iterate over a url
+                    self.scrapeIterate(section_name, these_settings, this_parser);
+                    huddledb.disconnect();
+                } else {
+                    self.scrapeSingle(settings, section_name);
+                }
             }
         });
     }
+
+    ammendDatabaseColumn(settings){
+        const dbsource = settings['dbsource'];
+        // Get the database array
+        return huddledb.query(dbsource['model'], dbsource['query'], {}).then(function(results){
+            let data_to_ammend = [];
+            _.each(results, function(result){
+                data_to_ammend.push(result[dbsource['col']]);
+            });
+
+            // Fill the array with the column data
+            settings['iteration_vars'][dbsource['col']]['array'] = data_to_ammend;
+        });
+    }
+
 
     scrapeIterate(section_name, section_settings, parser){
         let self = this;
@@ -62,6 +89,7 @@ class Scrapey{
             // Return the promise from the query
             return huddledb.queryOne(ScrapeyCacheModel, queryParams)
                 .then(function(result){
+                    
                     let scrapeyCache = result;
                     
                     let params = {
@@ -186,10 +214,9 @@ class Scrapey{
                     // Convert the increment to an array
 
                     array_to_loop = _.range(itsettings['start'], itsettings['end']+1);
-                } else if(itsettings['type']==='array'){
+                } else if(itsettings['type']==='array' || itsettings['type']==='dbsource'){
                     array_to_loop = itsettings['array'];
-                }
-
+                } 
 
                 _.each(array_to_loop, function(element){
                     var new_section_name = this_section_name+"-"+itvar_name+":"+element;
@@ -210,11 +237,15 @@ class Scrapey{
                     
                     if(url_obj[this_section_name].hasOwnProperty('update_if_exists') &&
                        url_obj[this_section_name]['update_if_exists']==true){
+                        // Carryover the current update settings
                         tmp_obj[new_section_name]['update_if_exists'] = true;
                     } else {
                         tmp_obj[new_section_name]['update_if_exists'] = false;
 
-                        if(itsettings['allowed_updates'] !== undefined &&
+                        if(typeof(itsettings['allowed_updates'])==='string'
+                           && itsettings['allowed_updates'] === 'all'){
+                            tmp_obj[new_section_name]['update_if_exists'] = true;
+                        } else if(itsettings['allowed_updates'] !== undefined &&
                            itsettings['allowed_updates'].indexOf(element) > -1){
                             tmp_obj[new_section_name]['update_if_exists'] = true;
                         }
@@ -234,4 +265,7 @@ class Scrapey{
 let scrapey = new Scrapey();
 
 //scrapey.dispatchSettings(NFLTeamStandingsConf);
-scrapey.dispatchSettings(NFLScoresConf);
+//scrapey.dispatchSettings(NFLScoresConf);
+//scrapey.dispatchSettings(NFLTeamRosterConf);
+//scrapey.dispatchSettings(FiveThirtyEightConf);
+scrapey.dispatchSettings(NFLTeamStatsConf);

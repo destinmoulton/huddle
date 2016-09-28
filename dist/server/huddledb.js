@@ -117,8 +117,11 @@ var HuddleDB = function () {
             var self = this;
 
             if (!self._isConnected()) {
-                mongoose.connect(mongo_url);
-                self._connected = true;
+
+                if (mongoose.connection.readyState === 0) {
+                    mongoose.connect(mongo_url);
+                    self._connected = true;
+                }
             }
         }
 
@@ -223,6 +226,21 @@ var HuddleDB = function () {
             return promise.then(function (result) {
                 self._dequeueConnection(conn);
                 return result;
+            }).catch(function (err) {
+                self._dequeueConnection(conn);
+                self._error(err);
+                return err;
+            });
+        }
+    }, {
+        key: 'remove',
+        value: function remove(model, remove_params) {
+            var self = this;
+
+            var conn = self._enqueueConnection();
+            return model.remove(remove_params).then(function () {
+                self._dequeueConnection(conn);
+                return true;
             }).catch(function (err) {
                 self._dequeueConnection(conn);
                 self._error(err);

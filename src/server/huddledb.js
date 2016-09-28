@@ -93,8 +93,11 @@ class HuddleDB {
         var self = this;
 
         if(!self._isConnected()){
-            mongoose.connect(mongo_url);
-            self._connected = true;
+
+            if(mongoose.connection.readyState===0){
+                mongoose.connect(mongo_url);
+                self._connected = true;
+            }
         }
     }
 
@@ -194,6 +197,20 @@ class HuddleDB {
             return result;
         })
         .catch(function(err){
+            self._dequeueConnection(conn);
+            self._error(err);
+            return err;
+        });
+    }
+
+    remove(model, remove_params){
+        var self = this;
+
+        let conn = self._enqueueConnection();
+        return model.remove(remove_params).then(function(){
+            self._dequeueConnection(conn);
+            return true;
+        }).catch(function(err){
             self._dequeueConnection(conn);
             self._error(err);
             return err;

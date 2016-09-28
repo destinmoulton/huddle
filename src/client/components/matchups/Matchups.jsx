@@ -65,7 +65,8 @@ class Matchups extends React.Component {
 
     render(){
         return (
-            <div>
+            <div >
+                <div className="col-md-12">
                 <h1>Matchups</h1>
                 Year:&nbsp;
                 <select id='select-matchup-year' defaultValue={this.state.year} onChange={this.selectChangeYear.bind(this)}>
@@ -79,13 +80,13 @@ class Matchups extends React.Component {
                         return (<option key={week}>{week}</option>);
                     })}
                 </select>
-                <ul>
+                </div>
                 {this.state.matchups.map(function(matchup){
                     return (
                             <MatchupTable matchup={matchup}/>
                            );
                 })}
-                </ul>
+                
             </div>
         );
     }

@@ -14,7 +14,9 @@ var NFLTeamRosterSchema = new Schema({
     scrapey_url_id: String,
     year: Number,
     team_abbr: String,
-    number: Number,
+    nfl_id: String,
+    url_safe_name: String,
+    player_number: Number,
     first_name: String,
     last_name: String,
     position: String,
@@ -28,7 +30,7 @@ var NFLTeamRosterSchema = new Schema({
     created_at: Date
 });
 
-NFLTeamStandingsSchema.pre('save', function (next) {
+NFLTeamRosterSchema.pre('save', function (next) {
     // Set the updated and creation dates
     var nowDate = new Date();
 

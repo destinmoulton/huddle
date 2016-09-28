@@ -28726,41 +28726,41 @@
 	                'div',
 	                null,
 	                _react2.default.createElement(
-	                    'h1',
-	                    null,
-	                    'Matchups'
+	                    'div',
+	                    { className: 'col-md-12' },
+	                    _react2.default.createElement(
+	                        'h1',
+	                        null,
+	                        'Matchups'
+	                    ),
+	                    'Year: ',
+	                    _react2.default.createElement(
+	                        'select',
+	                        { id: 'select-matchup-year', defaultValue: this.state.year, onChange: this.selectChangeYear.bind(this) },
+	                        this.years_array.map(function (year) {
+	                            return _react2.default.createElement(
+	                                'option',
+	                                { key: year },
+	                                year
+	                            );
+	                        })
+	                    ),
+	                    'Week: ',
+	                    _react2.default.createElement(
+	                        'select',
+	                        { id: 'select-matchup-week', defaultValue: this.state.week, onChange: this.selectChangeWeek.bind(this) },
+	                        this.weeks_array.map(function (week) {
+	                            return _react2.default.createElement(
+	                                'option',
+	                                { key: week },
+	                                week
+	                            );
+	                        })
+	                    )
 	                ),
-	                'Year: ',
-	                _react2.default.createElement(
-	                    'select',
-	                    { id: 'select-matchup-year', defaultValue: this.state.year, onChange: this.selectChangeYear.bind(this) },
-	                    this.years_array.map(function (year) {
-	                        return _react2.default.createElement(
-	                            'option',
-	                            { key: year },
-	                            year
-	                        );
-	                    })
-	                ),
-	                'Week: ',
-	                _react2.default.createElement(
-	                    'select',
-	                    { id: 'select-matchup-week', defaultValue: this.state.week, onChange: this.selectChangeWeek.bind(this) },
-	                    this.weeks_array.map(function (week) {
-	                        return _react2.default.createElement(
-	                            'option',
-	                            { key: week },
-	                            week
-	                        );
-	                    })
-	                ),
-	                _react2.default.createElement(
-	                    'ul',
-	                    null,
-	                    this.state.matchups.map(function (matchup) {
-	                        return _react2.default.createElement(_MatchupTable2.default, { matchup: matchup });
-	                    })
-	                )
+	                this.state.matchups.map(function (matchup) {
+	                    return _react2.default.createElement(_MatchupTable2.default, { matchup: matchup });
+	                })
 	            );
 	        }
 	    }]);
@@ -28817,8 +28817,8 @@
 	            var awscores = matchup.scores.away;
 	            var hoscores = matchup.scores.home;
 	            return _react2.default.createElement(
-	                'li',
-	                null,
+	                'div',
+	                { className: 'col-md-4' },
 	                _react2.default.createElement(
 	                    'h5',
 	                    null,

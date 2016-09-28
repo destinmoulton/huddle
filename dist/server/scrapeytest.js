@@ -15,7 +15,10 @@ var huddledb = require('./huddledb');
 var ScrapeyCacheModel = require('./models/scrapeycache.model');
 
 //const NFLTeamStandingsConf = require('./config/scrapey/nflteamstandings.scrapey.conf');
-var NFLScoresConf = require('./config/scrapey/nflscores.scrapey');
+//const NFLScoresConf = require('./config/scrapey/nflscores.scrapey');
+//const NFLTeamRosterConf = require('./config/scrapey/nflteamroster.scrapey');
+//const FiveThirtyEightConf = require('./config/scrapey/fivethirtyeight.scrapey');
+var NFLTeamStatsConf = require('./config/scrapey/nflteamstats.scrapey');
 
 var jquery_url = "https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js";
 var jquery_inject = fs.readFileSync('../../public/js/jquery-2.2.4.min.js').toString();
@@ -38,13 +41,37 @@ var Scrapey = function () {
                 var these_settings = settings['toscrape'][section_name];
                 var this_parser = settings['parser'];
 
-                if (these_settings.hasOwnProperty('iteration_vars')) {
-                    // Iterate over a url
-                    self.scrapeIterate(section_name, these_settings, this_parser);
-                    huddledb.disconnect();
+                if (these_settings.hasOwnProperty('dbsource')) {
+                    self.ammendDatabaseColumn(these_settings).then(function () {
+                        // Iterate over the url with the new array data from the db
+                        self.scrapeIterate(section_name, these_settings, this_parser);
+                    });
                 } else {
-                    self.scrapeSingle(settings, section_name);
+                    // Just do a vanilla scrape
+
+                    if (these_settings.hasOwnProperty('iteration_vars')) {
+                        // Iterate over a url
+                        self.scrapeIterate(section_name, these_settings, this_parser);
+                        huddledb.disconnect();
+                    } else {
+                        self.scrapeSingle(settings, section_name);
+                    }
                 }
+            });
+        }
+    }, {
+        key: 'ammendDatabaseColumn',
+        value: function ammendDatabaseColumn(settings) {
+            var dbsource = settings['dbsource'];
+            // Get the database array
+            return huddledb.query(dbsource['model'], dbsource['query'], {}).then(function (results) {
+                var data_to_ammend = [];
+                _.each(results, function (result) {
+                    data_to_ammend.push(result[dbsource['col']]);
+                });
+
+                // Fill the array with the column data
+                settings['iteration_vars'][dbsource['col']]['array'] = data_to_ammend;
             });
         }
     }, {
@@ -66,6 +93,7 @@ var Scrapey = function () {
 
                 // Return the promise from the query
                 return huddledb.queryOne(ScrapeyCacheModel, queryParams).then(function (result) {
+
                     var scrapeyCache = result;
 
                     var params = {
@@ -192,7 +220,7 @@ var Scrapey = function () {
                         // Convert the increment to an array
 
                         array_to_loop = _.range(itsettings['start'], itsettings['end'] + 1);
-                    } else if (itsettings['type'] === 'array') {
+                    } else if (itsettings['type'] === 'array' || itsettings['type'] === 'dbsource') {
                         array_to_loop = itsettings['array'];
                     }
 
@@ -214,11 +242,14 @@ var Scrapey = function () {
                         tmp_obj[new_section_name]['iterator_ids'][itvar_name] = element;
 
                         if (url_obj[this_section_name].hasOwnProperty('update_if_exists') && url_obj[this_section_name]['update_if_exists'] == true) {
+                            // Carryover the current update settings
                             tmp_obj[new_section_name]['update_if_exists'] = true;
                         } else {
                             tmp_obj[new_section_name]['update_if_exists'] = false;
 
-                            if (itsettings['allowed_updates'] !== undefined && itsettings['allowed_updates'].indexOf(element) > -1) {
+                            if (typeof itsettings['allowed_updates'] === 'string' && itsettings['allowed_updates'] === 'all') {
+                                tmp_obj[new_section_name]['update_if_exists'] = true;
+                            } else if (itsettings['allowed_updates'] !== undefined && itsettings['allowed_updates'].indexOf(element) > -1) {
                                 tmp_obj[new_section_name]['update_if_exists'] = true;
                             }
                         }
@@ -239,4 +270,7 @@ var Scrapey = function () {
 var scrapey = new Scrapey();
 
 //scrapey.dispatchSettings(NFLTeamStandingsConf);
-scrapey.dispatchSettings(NFLScoresConf);
+//scrapey.dispatchSettings(NFLScoresConf);
+//scrapey.dispatchSettings(NFLTeamRosterConf);
+//scrapey.dispatchSettings(FiveThirtyEightConf);
+scrapey.dispatchSettings(NFLTeamStatsConf);
