@@ -11,14 +11,17 @@ var _ = require('lodash');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var OFFENSIVE_STAT_TEMPLATE = require('./nfloffensivestats.template');
+var OFFENSIVE_STAT_TEMPLATE = require('./templates/nfloffensivestats.template');
+var DEFENSIVE_STAT_TEMPLATE = require('./templates/nfldefensivestats.template');
 
 var NFLTeamStatsSchema = new Schema({
     scrapey_url_id: String,
     year: Number,
     team_abbr: String,
+    season_type: String,
     games_played: Number,
     offensive_stats: _.clone(OFFENSIVE_STAT_TEMPLATE),
+    defensive_stats: _.clone(DEFENSIVE_STAT_TEMPLATE),
     updated_at: Date,
     created_at: Date
 });

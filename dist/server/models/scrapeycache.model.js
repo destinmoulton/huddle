@@ -16,7 +16,7 @@ var scrapeyCacheSchema = new Schema({
     url: String,
     html_title: String,
     html_page: String,
-    html_scrapable: String,
+    json_string: String,
     updated_at: Date,
     created_at: Date
 });

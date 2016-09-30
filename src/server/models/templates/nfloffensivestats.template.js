@@ -1,9 +1,7 @@
-'use strict';
-
 /**
  * Stat template for the NFL Offense
  */
-var OFFENSIVE_STAT_TEMPLATE = {
+const OFFENSIVE_STAT_TEMPLATE = {
     'GAME_STATS': {
         scrapey_url_id: String,
         TOTAL_POINTS_GAME_AVG: Number,
@@ -23,8 +21,9 @@ var OFFENSIVE_STAT_TEMPLATE = {
         TIME_OF_POSS_SECONDS_PER_GAME_AVG: String,
         FUMBLES_TOTAL: Number,
         FUMBLES_LOST: Number,
-        TURNOVER_RATIO: String
+        TURNOVER_RATIO: Number
     },
+
 
     'TEAM_PASSING': {
         scrapey_url_id: String,
@@ -39,7 +38,7 @@ var OFFENSIVE_STAT_TEMPLATE = {
         PASSING_INTERCEPTIONS: Number,
         PASSING_FIRST_DOWNS: Number,
         PASSING_FIRST_DOWN_PERCENTAGE: Number,
-        PASSING_LONG: String,
+        PASSING_LONG: Number,
         PASSING_20PLUS_YARDS_EACH: Number,
         PASSING_40PLUS_YARDS_EACH: Number,
         PASSING_SACKED: Number,
@@ -54,7 +53,7 @@ var OFFENSIVE_STAT_TEMPLATE = {
         RUSHING_AVERAGE_YARDS: Number,
         RUSHING_YARDS_PER_GAME_AVG: Number,
         RUSHING_TOUCHDOWNS: Number,
-        RUSHING_LONG: String,
+        RUSHING_LONG: Number,
         RUSHING_FIRST_DOWNS: Number,
         RUSHING_FIRST_DOWN_PERCENTAGE: Number,
         RUSHING_20PLUS_YARDS_EACH: Number,
@@ -68,7 +67,7 @@ var OFFENSIVE_STAT_TEMPLATE = {
         RECEIVING_YARDS: Number,
         RECEIVING_AVERAGE_YARDS: Number,
         RECEIVING_YARDS_PER_GAME_AVG: Number,
-        RECEIVING_LONG: String,
+        RECEIVING_LONG: Number,
         RECEIVING_TOUCHDOWNS: Number,
         RECEIVING_20PLUS_YARDS_EACH: Number,
         RECEIVING_40PLUS_YARDS_EACH: Number,
@@ -95,7 +94,7 @@ var OFFENSIVE_STAT_TEMPLATE = {
         KICK_RETURNS: Number,
         KICK_RETURNS_YARDS: Number,
         KICK_RETURNS_AVERAGE_YARDS: Number,
-        KICK_RETURNS_LONG: String,
+        KICK_RETURNS_LONG: Number,
         KICK_RETURNS_TOUCHDOWNS: Number,
         KICK_RETURNS_20PLUS_YARDS_EACH: Number,
         KICK_RETURNS_40PLUS_YARDS_EACH: Number,
@@ -104,7 +103,7 @@ var OFFENSIVE_STAT_TEMPLATE = {
         PUNT_RETURNS: Number,
         PUNT_RETURNS_YARDS: Number,
         PUNT_RETURNS_AVERAGE_YARDS: Number,
-        PUNT_RETURNS_LONG: String,
+        PUNT_RETURNS_LONG: Number,
         PUNT_RETURNS_TOUCHDOWNS: Number,
         PUNT_RETURNS_20PLUS_YARDS_EACH: Number,
         PUNT_RETURNS_40PLUS_YARDS_EACH: Number,
@@ -130,7 +129,7 @@ var OFFENSIVE_STAT_TEMPLATE = {
         PUNTING_RETURN_YARDS: Number,
         PUNTING_RETURN_TOUCHDOWNS: Number
     },
-
+    
     'SCORING': {
         scrapey_url_id: String,
         TOUCHDOWNS_RUSHING: Number,
