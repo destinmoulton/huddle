@@ -103,6 +103,5 @@ class NFLPlayerInjuriesScraper extends Scrapey{
     }
 }
 
-let injuryScraper = new NFLPlayerInjuriesScraper();
-injuryScraper.start();
-//module.exports = NFLPlayerInjuriesScraper;
+module.exports = new NFLPlayerInjuriesScraper();
+

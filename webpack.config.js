@@ -8,7 +8,7 @@ var config = {
     entry: APP_DIR + '/index.jsx',
     output: {
         path: BUILD_DIR,
-        filename: 'reactclient.js'
+        filename: 'huddle.react.js'
     },
     module: {
         loaders : [

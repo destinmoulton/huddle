@@ -31,24 +31,27 @@ class Scrapey{
     }
 
 
-    start(){
+    start(callback_when_complete){
         const self = this;
 
         // Dispatch the scraping (loop over the blocks of settings)
         _.each(self.scrape_settings, function(settings_subset){
             
             if(settings_subset['options'].hasOwnProperty('dbsource')){
-                self.ammendDatabaseColumn(settings_subset)
+                return self.ammendDatabaseColumn(settings_subset)
                     .then(function(){
                         // Iterate over the url with the new array data from the db
-                        self.scrapeIterate(settings_subset);
+                        return self.scrapeIterate(settings_subset).then(function(){
+                            callback_when_complete();
+                        });
                     }); 
             } else {
                 // Just do a vanilla scrape
                 if(settings_subset['options'].hasOwnProperty('iteration_vars')){
                     // Iterate over a url
-                    self.scrapeIterate(settings_subset);
-                    huddledb.disconnect();
+                    return self.scrapeIterate(settings_subset).then(function(){
+                        callback_when_complete();
+                    });;
                 } else {
                     throw new Error("Scrapey:: Non iteration feature not supported.");
                 }
@@ -68,14 +71,32 @@ class Scrapey{
         // Get the database array
         return huddledb.query(dbsource['model'], dbsource['query'], {})
             .then(function(results){
-                let data_to_ammend = [];
-                _.each(results, function(result){
-                    data_to_ammend.push(result[dbsource['col']]);
-                });
+                let columns = [];
 
-                // Fill the array with the column data
-                settings_subset['options']['iteration_vars'][dbsource['col']]['array'] = data_to_ammend;
+                if(typeof dbsource['col'] === 'string'){
+                    // Make a single column (string) into an array
+                    columns.push(dbsource['col']);
+                } else if(Array.isArray(dbsource['col'])){
+                    columns = dbsource['col'];
+                }
+
+                
+                if(dbsource.hasOwnProperty('custom_transform')){
+                    dbsource.custom_transform(settings_subset, results);
+                } else{
+                    // Add the data to the column
+                    _.each(columns, function(col){
+                        let data_to_ammend = [];
+                        _.each(results, function(result){
+                            data_to_ammend.push(result[col]);
+                        });
+                        
+                        // Fill the array with the column data
+                        settings_subset['options']['iteration_vars'][col]['array'] = data_to_ammend;
+                    });
+                }
             });
+
     }
 
 

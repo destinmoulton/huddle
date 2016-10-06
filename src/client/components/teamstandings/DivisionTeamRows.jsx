@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 
+import Logo from '../shared/Logo.jsx';
+
 import huddlejax from '../../lib/huddlejax';
 
 class DivisionTeamRows extends React.Component{
@@ -23,7 +25,7 @@ class DivisionTeamRows extends React.Component{
 
 
     loadDataFromServer(props){
-        const request_data = {
+        const request_params = {
             'model':'NFLTeamStandingsModel',
             'query_filters':{
                 'year':props.year,
@@ -32,9 +34,9 @@ class DivisionTeamRows extends React.Component{
             'sort_by':{'stats.wins':-1}
         }
 
-        huddlejax.dataRequest(request_data, (data)=>{
+        huddlejax.query(request_params, (resp_data)=>{
             this.setState({
-                teamstandings: data['modeldata']['NFLTeamStandingsModel']
+                teamstandings: resp_data
             });
         });    
     
@@ -46,7 +48,8 @@ class DivisionTeamRows extends React.Component{
                 {this.state.teamstandings.map(function(row){
                     return (
                             <tr key={row['_id']}>
-                                <td>{row['full_team_name']}</td>
+                                <td><Logo team_abbr={row['team_abbr']}/></td>
+                                <td><Link to={"/teaminfo/" + row.team_abbr}>{row['full_team_name']}</Link></td>
                                 <td>{row['stats']['wins']}</td>
                                 <td>{row['stats']['losses']}</td>
                                 <td>{row['stats']['ties']}</td>

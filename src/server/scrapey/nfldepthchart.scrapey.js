@@ -88,5 +88,5 @@ class NFLDepthChartScraper extends Scrapey{
     }
 }
 
-let depthChartScraper = new NFLDepthChartScraper();
-depthChartScraper.start();
+module.exports = new NFLDepthChartScraper();
+

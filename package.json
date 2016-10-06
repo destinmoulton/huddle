@@ -7,7 +7,7 @@
     "runserver": "nodemon -e js,html --watch dist/server ./bin/www",
     "runbabel": "babel frontendsrc --watch --out-file public/reactfrontend/frontend.js",
     "babelscrapey": "babel src/server --watch --out-dir dist/server",
-    "runwebpack": "webpack --config webpack.config.js -d --watch",
+    "runwebpack": "webpack --config webpack.config.js -d --watch ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Destin Moulton",
@@ -36,6 +36,8 @@
     "react-router": "^2.8.1",
     "request": "^2.75.0",
     "request-promise": "^4.1.1",
+    "socket.io": "^1.4.8",
+    "socket.io-client": "^1.4.8",
     "webdriverio": "^4.2.12",
     "webpack": "^1.13.2"
   }

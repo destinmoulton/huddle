@@ -150,5 +150,5 @@ class NFLMatchupsScraper extends Scrapey{
     }
 }
 
-let nflMatchups = new NFLMatchupsScraper();
-nflMatchups.start();
+module.exports = new NFLMatchupsScraper();
+

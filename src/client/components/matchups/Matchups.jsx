@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import huddlejax from '../../lib/huddlejax';
 
+
 import MatchupTable from './MatchupTable.jsx';
 
 class Matchups extends React.Component {
@@ -27,10 +28,10 @@ class Matchups extends React.Component {
     }
 
     componentDidMount(){
-        this.loadDataFromServer();
+        this._loadDataFromServer();
     }
 
-    loadDataFromServer(){
+    _loadDataFromServer(){
 
         const request_data = {
             'model':'NFLMatchupsModel',
@@ -41,17 +42,28 @@ class Matchups extends React.Component {
             'sort_by':{'game_date':1}
         }
 
-        huddlejax.dataRequest(request_data, (data)=>{
+        huddlejax.query(request_data, (data)=>{
             this.setState({
-                matchups: data['modeldata']['NFLMatchupsModel']
+                matchups: data
             });
         });    
+    }
+
+    _scrapeMatchups(){
+        const self = this;
+        const request_data = {
+            'scraper':'NFLMatchups'
+        };
+        huddlejax.scrape(request_data, ()=>{
+            // Reload the data
+            self._loadDataFromServer();
+        });
     }
     
     // The select box event fires
     selectChangeYear(e){
         this.setState({year:e.target.value}, function(){
-            this.loadDataFromServer();
+            this._loadDataFromServer();
         });
         
     }
@@ -59,7 +71,7 @@ class Matchups extends React.Component {
     // The select box event fires
     selectChangeWeek(e){
         this.setState({week:e.target.value}, function(){
-            this.loadDataFromServer();
+            this._loadDataFromServer();
         });
     }
 
@@ -68,6 +80,7 @@ class Matchups extends React.Component {
             <div >
                 <div className="col-md-12">
                 <h1>Matchups</h1>
+                <button className='btn' onClick={this._scrapeMatchups.bind(this)}>Scrape</button>
                 Year:&nbsp;
                 <select id='select-matchup-year' defaultValue={this.state.year} onChange={this.selectChangeYear.bind(this)}>
                     {this.years_array.map(function(year){ 
@@ -83,7 +96,7 @@ class Matchups extends React.Component {
                 </div>
                 {this.state.matchups.map(function(matchup){
                     return (
-                            <MatchupTable matchup={matchup}/>
+                            <MatchupTable matchup={matchup}  key={matchup._id}/>
                            );
                 })}
                 

@@ -195,5 +195,5 @@ class NFLTeamStatsScraper extends Scrapey{
     }
 }
 
-let teamStats = new NFLTeamStatsScraper();
-teamStats.start();
+module.exports = new NFLTeamStatsScraper();
+

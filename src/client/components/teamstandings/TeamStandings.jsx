@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Link } from 'react-router';
 
 import huddlejax from '../../lib/huddlejax';
@@ -21,21 +22,29 @@ class TeamStandings extends React.Component {
     }
 
     componentDidMount(){
-        this.loadDataFromServer();
+        this._loadDataFromServer();
     }
 
-    loadDataFromServer(){
-        var self = this;
+    _loadDataFromServer(){
         const request_data = {
-            'staticdata':[
-                'NFLDivisions'
-            ]
+            'staticdata_id':'NFLDivisions'
         };
 
-        huddlejax.dataRequest(request_data, function(data){
-            self.setState({
-                   divisions: data['staticdata']['NFLDivisions']
-            });    
+        huddlejax.staticdata(request_data, (resp_data)=>{
+            this.setState({
+                divisions: resp_data
+            });
+        });
+    }
+
+    _scrapeTeamStandings(){
+        const self = this;
+        const request_data = {
+            'scraper':'NFLTeamStandings'
+        };
+        huddlejax.scrape(request_data, ()=>{
+            // Reload the data
+            self._loadDataFromServer();
         });
     }
     
@@ -48,6 +57,7 @@ class TeamStandings extends React.Component {
         return (
             <div>
                 <h1>Team Standings</h1>
+                <button className='btn' onClick={this._scrapeTeamStandings.bind(this)}>Scrape</button>
                 <select id='select-team-standing-year' defaultValue={this.state.year} onChange={this.selectChangeYear.bind(this)}>
                     {this.years_array.map(function(year){ 
                         return (<option key={year}>{year}</option>);

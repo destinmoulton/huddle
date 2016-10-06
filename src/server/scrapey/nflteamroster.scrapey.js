@@ -108,5 +108,6 @@ class NFLTeamRosterScraper extends Scrapey{
     }
 }
 
-let teamRoster = new NFLTeamRosterScraper();
-teamRoster.start();
+
+module.exports = new NFLTeamRosterScraper();
+

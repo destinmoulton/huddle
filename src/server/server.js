@@ -1,10 +1,26 @@
 const express = require('express');
+
+const server = express();
+
+// Create the httpserver
+const httpserver = require('http').Server(server);
+
+// nunjucks for templating
 const nunjucks = require('nunjucks');
 const path = require('path');
 const bodyparser = require('body-parser');
 
-const routes = require('./routes/routes');
-const server = express();
+
+// Setup body-parser to parse json requests
+server.use(bodyparser.json());
+server.use(bodyparser.urlencoded({extended:true}));
+const routes = require('./routes')(server);
+
+// Setup socket.io
+var io = require('socket.io')(httpserver);
+require('./socketio')(io);
+
+
 
 const abspath = path.dirname(__filename);
 
@@ -16,13 +32,6 @@ nunjucks.configure(abspath+'/views', {
 
 // Set nunjucks as default template engine for express
 server.set('view engine', 'nunjucks');
-
-// Setup body-parser to parse json requests
-server.use(bodyparser.json());
-server.use(bodyparser.urlencoded({extended:true}));
-
-// Set the default routes
-server.use('/', routes);
 
 // Setup the public folder as static
 const public_dir = path.resolve(abspath+'/../../public');
@@ -60,4 +69,4 @@ server.use(function(err, req, res, next) {
     });
 });
 
-module.exports = server;
+module.exports = httpserver;

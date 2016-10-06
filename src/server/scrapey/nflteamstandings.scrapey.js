@@ -46,7 +46,7 @@ class NFLTeamStandingsScraper extends Scrapey{
             let data = {};
             var division_string = division + " Team";
             var $div_title_row = $container.find('td:contains("'+division_string+'")').parent();
-
+            
             // Start on the top row, so next works
             var $team_row = $div_title_row;
 
@@ -114,6 +114,7 @@ class NFLTeamStandingsScraper extends Scrapey{
                 standings_to_store.push(data);
             }
         });
+        
 
         // Store each standing in sequence using promises
         return Promise.each(standings_to_store, function(sdata){
@@ -144,5 +145,4 @@ class NFLTeamStandingsScraper extends Scrapey{
     }
 }
 
-let teamStandings = new NFLTeamStandingsScraper();
-teamStandings.start();
+module.exports = new NFLTeamStandingsScraper();
