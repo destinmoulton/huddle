@@ -51681,6 +51681,10 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _moment = __webpack_require__(/*! moment */ 294);
+	
+	var _moment2 = _interopRequireDefault(_moment);
+	
 	var _react = __webpack_require__(/*! react */ 1);
 	
 	var _react2 = _interopRequireDefault(_react);
@@ -51714,12 +51718,33 @@
 	    _createClass(TeamInfoInjuries, [{
 	        key: "componentDidMount",
 	        value: function componentDidMount() {
-	            this._loadRosterFromServer();
+	            this._scrape();
+	        }
+	
+	        /**
+	         * Scrape the data from the server.
+	         */
+	
+	    }, {
+	        key: "_scrape",
+	        value: function _scrape() {
+	            var _this2 = this;
+	
+	            var scrape_params = {
+	                scraper: 'NFLTeamRoster',
+	                options: {
+	                    team_abbr: this.props.params.team_abbr
+	                }
+	            };
+	
+	            _huddlejax2.default.scrape(scrape_params, function () {
+	                _this2._loadRosterFromServer();
+	            });
 	        }
 	    }, {
 	        key: "_loadRosterFromServer",
 	        value: function _loadRosterFromServer() {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            var year = new Date().getFullYear();
 	            var query_params = {
@@ -51731,7 +51756,7 @@
 	            };
 	
 	            _huddlejax2.default.query(query_params, function (data) {
-	                _this2.setState({
+	                _this3.setState({
 	                    roster: data
 	                });
 	            });
@@ -51790,7 +51815,7 @@
 	                            _react2.default.createElement(
 	                                "th",
 	                                null,
-	                                "DOB"
+	                                "DOB [Age]"
 	                            ),
 	                            _react2.default.createElement(
 	                                "th",
@@ -51803,6 +51828,7 @@
 	                        "tbody",
 	                        null,
 	                        roster_rows.map(function (roster) {
+	                            var age = (0, _moment2.default)().diff((0, _moment2.default)(roster['birthdate']), 'years');
 	                            return _react2.default.createElement(
 	                                "tr",
 	                                { key: roster['nfl_id'] },
@@ -51843,7 +51869,10 @@
 	                                _react2.default.createElement(
 	                                    "td",
 	                                    null,
-	                                    roster['birthdate']
+	                                    (0, _moment2.default)(roster['birthdate']).format("MM/DD/YYYY"),
+	                                    " [",
+	                                    age,
+	                                    " yrs]"
 	                                ),
 	                                _react2.default.createElement(
 	                                    "td",
@@ -51911,12 +51940,33 @@
 	    _createClass(TeamInfoInjuries, [{
 	        key: "componentDidMount",
 	        value: function componentDidMount() {
-	            this._loadInjuriesFromServer();
+	            this._scrape();
+	        }
+	
+	        /**
+	         * Scrape the data from the server.
+	         */
+	
+	    }, {
+	        key: "_scrape",
+	        value: function _scrape() {
+	            var _this2 = this;
+	
+	            var scrape_params = {
+	                scraper: 'NFLPlayerInjuries',
+	                options: {
+	                    team_abbr: this.props.params.team_abbr
+	                }
+	            };
+	
+	            _huddlejax2.default.scrape(scrape_params, function () {
+	                _this2._loadInjuriesFromServer();
+	            });
 	        }
 	    }, {
 	        key: "_loadInjuriesFromServer",
 	        value: function _loadInjuriesFromServer() {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            var year = new Date().getFullYear();
 	            var query_params = {
@@ -51928,7 +51978,7 @@
 	            };
 	
 	            _huddlejax2.default.query(query_params, function (data) {
-	                _this2.setState({
+	                _this3.setState({
 	                    injuries: data
 	                });
 	            });
@@ -52078,12 +52128,33 @@
 	    _createClass(TeamDepthChart, [{
 	        key: "componentDidMount",
 	        value: function componentDidMount() {
-	            this._loadDepthchartFromServer();
+	            this._scrape();
+	        }
+	
+	        /**
+	         * Scrape the data from the server.
+	         */
+	
+	    }, {
+	        key: "_scrape",
+	        value: function _scrape() {
+	            var _this2 = this;
+	
+	            var scrape_params = {
+	                scraper: 'NFLDepthChart',
+	                options: {
+	                    team_abbr: this.props.params.team_abbr
+	                }
+	            };
+	
+	            _huddlejax2.default.scrape(scrape_params, function () {
+	                _this2._loadDepthchartFromServer();
+	            });
 	        }
 	    }, {
 	        key: "_loadDepthchartFromServer",
 	        value: function _loadDepthchartFromServer() {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            var year = new Date().getFullYear();
 	            var query_params = {
@@ -52095,8 +52166,7 @@
 	            };
 	
 	            _huddlejax2.default.query(query_params, function (data) {
-	                console.log(data);
-	                _this2.setState({
+	                _this3.setState({
 	                    depthchart: data[0]
 	                });
 	            });
@@ -52179,7 +52249,7 @@
 	            var section_data = _props.section_data;
 	
 	            var positions = Object.keys(section_data);
-	            console.log(positions);
+	            var player_count = 0;
 	            return _react2.default.createElement(
 	                "div",
 	                null,
@@ -52251,11 +52321,13 @@
 	                                player_keys.map(function (player_key) {
 	                                    if (player_key != '_id') {
 	                                        var player = players[player_key];
-	                                        console.log(player);
+	
+	                                        var player_full_name = player['player_first_name'] + " " + player['player_last_name'];
+	                                        player_count++;
 	                                        return _react2.default.createElement(
 	                                            "td",
-	                                            { id: player['nfl_player_id'] },
-	                                            player['player_first_name'] + " " + player['player_last_name']
+	                                            { key: player_count },
+	                                            player_full_name
 	                                        );
 	                                    }
 	                                })

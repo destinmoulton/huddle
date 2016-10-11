@@ -5,6 +5,7 @@ const _ = require('lodash');
 const cheerio = require('cheerio');
 const Promise = require('bluebird');
 const jsdom = require("jsdom");
+const moment = require("moment");
 const reqprom = require("request-promise");
 
 const huddledb = require('../huddledb');
@@ -15,15 +16,28 @@ class Scrapey{
 
     constructor(){
         this.huddledb = huddledb;
+
         // Stub to be overwritten by child scraper classes
         this.scrape_settings = {};
+
     }
 
     /**
      * A stub parse function to be overwritten by child classes
      */
     parse(){
-        throw new Error("Scrapey:: parse() function not implemented!");
+        throw new Error("Scrapey:: parse() function not implemented by inheriting class!");
+    }
+
+    /**
+     * A stup setup function to be overwritten by the child class
+     * This will setup the scrape_settings local variable 
+     * configuring the scrape session.
+     *
+     * @param {object} scrape_options - Possible options to alter the scrape_settings
+     */
+    setup(scrape_options){
+        throw new Error("Scrapey:: setup() function not implemented by inheriting class!");
     }
 
     error(err){
@@ -31,8 +45,11 @@ class Scrapey{
     }
 
 
-    start(callback_when_complete){
+    run(scrape_options, callback_when_complete){
         const self = this;
+
+        // Setup the scrape_settings for this scraper
+        self.setup(scrape_options);
 
         // Dispatch the scraping (loop over the blocks of settings)
         _.each(self.scrape_settings, function(settings_subset){
@@ -122,14 +139,14 @@ class Scrapey{
         return Promise.each(generated_urls, function(url_obj){
             return self.getCurrentCache(url_obj)
                 .then(function(scrapeyCacheDBRow){
-
-                    if(url_obj['update_if_exists'] || 
-                       scrapeyCacheDBRow === null){
+                    
+                    if(self.shouldRunScrapey(settings_subset, url_obj, scrapeyCacheDBRow)){
                         console.log("Performing scrape on: " + url_obj['name']);
 
                         // Returning another promise; no need to check .then()
                         return self.scrapeIt(settings_subset, url_obj, scrapeyCacheDBRow);
                     }
+                    console.log("Not running scrapey for some reason.");
                     return true;
                 });
         }).catch(function(err){
@@ -138,6 +155,44 @@ class Scrapey{
         });
     }
 
+    /**
+     * Check whether a scrape should be run
+     * 
+     * @return {bool} 
+     */
+    shouldRunScrapey(settings_subset, url_obj, scrapeyCacheDBRow){
+        
+        if(scrapeyCacheDBRow === null){
+            // Run scrape - there is no data
+            return true;
+        }
+
+        if(settings_subset['options'].hasOwnProperty('valid_timespan')){
+            const last_updated_moment = moment(scrapeyCacheDBRow.updated_at);
+            let current_moment = moment();
+            let time_before_moment = {};
+            switch (settings_subset['options']['valid_timespan']){
+            case 'minute':
+                time_before_moment = current_moment.subtract(1,'minute');
+                break;
+            case 'hour':
+                time_before_moment = current_moment.subtract(1,'hour');
+                break;
+            case 'day':
+                time_before_moment = current_moment.subtract(1,'day');
+                break;
+            }
+
+            if(last_updated_moment.isBefore(time_before_moment)){
+                // The scrape was last updated before the time_before_moment
+                return true;
+            } 
+            return false;
+        }
+
+        // Fall through to this boolean value
+        return url_obj['update_if_exists'];
+    }
 
     scrapeIt(settings_subset, url_obj, scrapeyCacheDBRow){
         const self = this;

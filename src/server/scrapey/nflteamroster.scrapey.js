@@ -8,29 +8,47 @@ const NFLTeamStandingsModel = require('../models/nflteamstandings.model');
 const Scrapey = require('./scrapey');
 
 class NFLTeamRosterScraper extends Scrapey{
-    constructor(){
-        super();
-
+    
+    setup(scrape_options){
         let thisYear = new Date().getFullYear();
-        this.scrape_settings = [{
-            'name':'nflteamroster',
-            'options':{
-                'scrape_type':'html',
-                'dbsource':{
-                    'model':NFLTeamStandingsModel,
-                    'col':'team_abbr',
-                    'query':{'year':thisYear}
-                },
-                'iteration_vars':{
-                    'team_abbr':{
-                        'type':'dbsource',                
-                        'allowed_updates':'all',
-                        'array':[]
-                    }
-                },
-                'iteration_url':'http://www.nfl.com/teams/roster?team=<team_abbr>',
-            }
-        }];
+        if(scrape_options.hasOwnProperty('team_abbr')){
+            this.scrape_settings = [{
+                'name':'nflteamroster',
+                'options':{
+                    'scrape_type':'html',
+                    'iteration_vars':{
+                        'team_abbr':{
+                            'type':'array',
+                            'allowed_updates':'all',
+                            'array':[scrape_options['team_abbr']]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://www.nfl.com/teams/roster?team=<team_abbr>',
+                }
+            }];
+        } else {
+            this.scrape_settings = [{
+                'name':'nflteamroster',
+                'options':{
+                    'scrape_type':'html',
+                    'dbsource':{
+                        'model':NFLTeamStandingsModel,
+                        'col':'team_abbr',
+                        'query':{'year':thisYear}
+                    },
+                    'iteration_vars':{
+                        'team_abbr':{
+                            'type':'dbsource',                
+                            'allowed_updates':'all',
+                            'array':[]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://www.nfl.com/teams/roster?team=<team_abbr>',
+                }
+            }];
+        }
     }
     
     parser(url_obj, page_data){

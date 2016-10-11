@@ -1,5 +1,6 @@
-
+import moment from "moment";
 import React from "react";
+
 
 import huddlejax from "../../lib/huddlejax.js";
 
@@ -14,7 +15,23 @@ export default class TeamInfoInjuries extends React.Component{
     }
 
     componentDidMount(){
-        this._loadRosterFromServer();
+        this._scrape();
+    }
+
+    /**
+     * Scrape the data from the server.
+     */
+    _scrape(){
+        const scrape_params = {
+            scraper:'NFLTeamRoster',
+            options:{
+                team_abbr:this.props.params.team_abbr
+            }
+        };
+
+        huddlejax.scrape(scrape_params, ()=>{
+            this._loadRosterFromServer();
+        });
     }
 
     _loadRosterFromServer(){
@@ -48,12 +65,13 @@ export default class TeamInfoInjuries extends React.Component{
                             <th>Status</th>
                             <th>Height</th>
                             <th>Weight</th>
-                            <th>DOB</th>
+                            <th>DOB [Age]</th>
                             <th>EXP</th>
                         </tr>
                     </thead>
                     <tbody>
                 {roster_rows.map(function(roster){
+                    let age = moment().diff(moment(roster['birthdate']), 'years');
                     return (
                             <tr key={roster['nfl_id']}>
                             <td>{roster['player_number']}</td>
@@ -62,7 +80,7 @@ export default class TeamInfoInjuries extends React.Component{
                             <td>{roster['status']}</td>
                             <td>{roster['height_feet']}&#39;{roster['height_inches']}&#34;</td>
                             <td>{roster['weight']}lbs</td>
-                            <td>{roster['birthdate']}</td>
+                            <td>{moment(roster['birthdate']).format("MM/DD/YYYY")} [{age} yrs]</td>
                             <td>{roster['years_experience']}</td>
                             </tr>
                     );

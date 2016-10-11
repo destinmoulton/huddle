@@ -14,7 +14,23 @@ export default class TeamInfoInjuries extends React.Component{
     }
 
     componentDidMount(){
-        this._loadInjuriesFromServer();
+        this._scrape();
+    }
+
+    /**
+     * Scrape the data from the server.
+     */
+    _scrape(){
+        const scrape_params = {
+            scraper:'NFLPlayerInjuries',
+            options:{
+                team_abbr:this.props.params.team_abbr
+            }
+        };
+
+        huddlejax.scrape(scrape_params, ()=>{
+            this._loadInjuriesFromServer();
+        });
     }
 
     _loadInjuriesFromServer(){

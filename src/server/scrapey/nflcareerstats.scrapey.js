@@ -10,14 +10,20 @@ const CAREER_STATS_TEMPLATE = require('../models/templates/nflcareerstats.templa
 const Scrapey = require('./scrapey');
 
 class NFLCareerStatsScraper extends Scrapey{
-    constructor(team_abbr){
-        super();
-        const self = this;
-        if(!team_abbr){
-            throw new Error("NFLCareerStatsScraper: You must supply a team abbr.")
-        }
 
-        let thisYear = new Date().getFullYear();
+    setup(scrape_options){
+        const self = this;
+
+        // Team abbr is required
+        if(!scrape_options.hasOwnProperty('team_abbr')){
+            throw new Error('Error: Must supply a team abbr in scrape_options for nflcareerstats.scrapey.js');
+            return;
+        }
+        let team_abbr = scrape_options['team_abbr'];
+
+        // Year is optional (default to this year)
+        let year = scrape_options['year'] || new Date().getFullYear();
+        
         this.scrape_settings = [{
             'name':'nflcareerstats',
             'options':{
@@ -25,7 +31,7 @@ class NFLCareerStatsScraper extends Scrapey{
                 'dbsource':{
                     'model':NFLTeamRosterModel,
                     'col':['nfl_id','url_safe_name'],
-                    'query':{'year':thisYear, 'team_abbr':team_abbr},
+                    'query':{'year':year, 'team_abbr':team_abbr},
                     'custom_transform':self.transform_fields_for_url_id
                 },
                 'iteration_vars':{
@@ -175,5 +181,5 @@ class NFLCareerStatsScraper extends Scrapey{
     }
 }
 
-module.exports = new NFLCareerStatsScraper(team_abbr);
+module.exports = new NFLCareerStatsScraper();
 

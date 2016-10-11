@@ -14,7 +14,23 @@ export default class TeamDepthChart extends React.Component{
     }
 
     componentDidMount(){
-        this._loadDepthchartFromServer();
+        this._scrape();
+    }
+    
+    /**
+     * Scrape the data from the server.
+     */
+    _scrape(){
+        const scrape_params = {
+            scraper:'NFLDepthChart',
+            options:{
+                team_abbr:this.props.params.team_abbr
+            }
+        };
+
+        huddlejax.scrape(scrape_params, ()=>{
+            this._loadDepthchartFromServer();
+        });
     }
 
     _loadDepthchartFromServer(){
@@ -28,7 +44,6 @@ export default class TeamDepthChart extends React.Component{
         }
 
         huddlejax.query(query_params, (data)=>{
-            console.log(data);
             this.setState({
                 depthchart:data[0]
             });

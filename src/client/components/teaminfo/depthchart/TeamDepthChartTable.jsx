@@ -4,7 +4,7 @@ export default class TeamDepthChartTable extends React.Component{
     render(){
         let { section_info,section_data } = this.props;
         let positions = Object.keys(section_data);
-        console.log(positions);
+        let player_count = 0;
         return (
             <div>
                 <h4>{section_info.title}</h4>
@@ -32,9 +32,11 @@ export default class TeamDepthChartTable extends React.Component{
                                 player_keys.map(function(player_key){
                                     if(player_key != '_id'){
                                         let player = players[player_key];
-                                        console.log(player);
+                                        
+                                        let player_full_name = player['player_first_name'] + " " + player['player_last_name'];
+                                        player_count++;
                                         return (
-                                                <td id={player['nfl_player_id']}>{player['player_first_name'] + " " + player['player_last_name']}</td>
+                                                <td key={player_count}>{player_full_name}</td>
                                         );
                                     }
                                 })

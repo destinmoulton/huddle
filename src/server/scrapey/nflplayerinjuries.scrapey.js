@@ -8,29 +8,48 @@ const NFLTeamStandingsModel = require('../models/nflteamstandings.model');
 const Scrapey = require('./scrapey');
 
 class NFLPlayerInjuriesScraper extends Scrapey{
-    constructor(){
-        super();
 
+    setup(scrape_options){
         let thisYear = new Date().getFullYear();
-        this.scrape_settings = [{
-            'name':'nflplayerinjuries',
-            'options':{
-                'scrape_type':'html',
-                'dbsource':{
-                    'model':NFLTeamStandingsModel,
-                    'col':'team_abbr',
-                    'query':{'year':thisYear}
-                },
-                'iteration_vars':{
-                    'team_abbr':{
-                        'type':'dbsource',                
-                        'allowed_updates':'all',
-                        'array':[]
-                    }
-                },
-                'iteration_url':'http://www.nfl.com/teams/injuries?team=<team_abbr>',
-            }
-        }];
+        if(scrape_options.hasOwnProperty('team_abbr')){
+            this.scrape_settings = [{
+                'name':'nflplayerinjuries',
+                'options':{
+                    'scrape_type':'html',
+                    'iteration_vars':{
+                        'team_abbr':{
+                            'type':'array',
+                            'allowed_updates':'all',
+                            'array':[scrape_options['team_abbr']]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://www.nfl.com/teams/injuries?team=<team_abbr>',
+                }
+            }];
+        } else {
+            // Get all the teams
+            this.scrape_settings = [{
+                'name':'nflplayerinjuries',
+                'options':{
+                    'scrape_type':'html',
+                    'dbsource':{
+                        'model':NFLTeamStandingsModel,
+                        'col':'team_abbr',
+                        'query':{'year':thisYear}
+                    },
+                    'iteration_vars':{
+                        'team_abbr':{
+                            'type':'dbsource',                
+                            'allowed_updates':'all',
+                            'array':[]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://www.nfl.com/teams/injuries?team=<team_abbr>',
+                }
+            }];
+        }
     }
     
     parser(url_obj, page_data){
@@ -86,7 +105,7 @@ class NFLPlayerInjuriesScraper extends Scrapey{
             'year':this_year
         };
 
-        // First clear the db of any of the current roster (trades, injuries, etc...)
+        // First clear the db of any of the current injuries
         return self.huddledb.remove(NFLPlayerInjuriesModel,remove_params).then(function(){
 
             // Store each player in sequence(promises)

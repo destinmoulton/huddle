@@ -7,29 +7,50 @@ const NFLTeamStandingsModel = require('../models/nflteamstandings.model');
 
 class NFLDepthChartScraper extends Scrapey{
 
-    constructor(){
-        super();
+    setup(scrape_options){
 
-        let thisYear = new Date().getFullYear();
-        this.scrape_settings = [{
-            'name':'nfldepthchart',
-            'options':{
-                'scrape_type':'json',
-                'dbsource':{
-                    'model':NFLTeamStandingsModel,
-                    'col':'team_abbr',
-                    'query':{'year':thisYear}
-                },
-                'iteration_vars':{
-                    'team_abbr':{
-                        'type':'dbsource',                
-                        'allowed_updates':'all',
-                        'array':[]
-                    }
-                },
-                'iteration_url':'http://feeds.nfl.com/feeds-rs/depthChartClub/byTeam/<team_abbr>.json'
-            }
-        }]
+        if(scrape_options.hasOwnProperty('team_abbr')){
+            // Limit to just one team (this is the way it should be done due to spam block)
+            this.scrape_settings = [{
+                'name':'nfldepthchart',
+                'options':{
+                    'scrape_type':'json',
+                    'iteration_vars':{
+                        'team_abbr':{
+                            'type':'array',                
+                            'allowed_updates':scrape_options['team_abbr'],
+                            'array':[scrape_options['team_abbr']]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://feeds.nfl.com/feeds-rs/depthChartClub/byTeam/<team_abbr>.json'
+                }
+            }];
+        } else {
+            // Year is optional (default to this year)
+            let year = scrape_options['year'] || new Date().getFullYear();
+
+            // Get all of the teams
+            this.scrape_settings = [{
+                'name':'nfldepthchart',
+                'options':{
+                    'scrape_type':'json',
+                    'dbsource':{
+                        'model':NFLTeamStandingsModel,
+                        'col':'team_abbr',
+                        'query':{'year':year}
+                    },
+                    'iteration_vars':{
+                        'team_abbr':{
+                            'type':'dbsource',                
+                            'allowed_updates':'all',
+                            'array':[]
+                        }
+                    },
+                    'iteration_url':'http://feeds.nfl.com/feeds-rs/depthChartClub/byTeam/<team_abbr>.json'
+                }
+            }];
+        }
     }
     
     parser(url_obj, page_data){
@@ -43,6 +64,7 @@ class NFLDepthChartScraper extends Scrapey{
             _.each(formation_obj['depthChartClubPositions'], function(depth_obj){
 
                 let position = depth_obj['position'];
+                console.log(position);
                 players[formation][position] = {};
 
                 _.each(depth_obj['depthChartClubPlayers'], function(player_obj){
@@ -65,7 +87,7 @@ class NFLDepthChartScraper extends Scrapey{
             'year':this_year
         };
 
-        // First clear the db of any of the current roster (trades, injuries, etc...)
+        // First clear the db of any of the current depth information
         return self.huddledb.remove(NFLTeamDepthModel,remove_params).then(function(){
             
             // Create new data

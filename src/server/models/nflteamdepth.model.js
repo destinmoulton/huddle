@@ -30,14 +30,15 @@ const NFLTeamDepthSchema = new Schema({
     year: Number,
     team_abbr: String,
     offense:{
+        WR:DepthSchema,
         WR1:DepthSchema,
+        WR2:DepthSchema,
         TE:DepthSchema,
         LT:DepthSchema,
         LG:DepthSchema,
         C:DepthSchema,
         RG:DepthSchema,
         RT:DepthSchema,
-        WR2:DepthSchema,
         QB:DepthSchema,
         FB:DepthSchema,
         RB:DepthSchema
@@ -51,9 +52,14 @@ const NFLTeamDepthSchema = new Schema({
         ILB:DepthSchema,
         ILB:DepthSchema,
         CB:DepthSchema,
-        CB:DepthSchema,
+        LB:DepthSchema,
+        RDE:DepthSchema,
+        LDE:DepthSchema,
+        RCB:DepthSchema,
+        LCB:DepthSchema,
         SS:DepthSchema,
-        FS:DepthSchema
+        FS:DepthSchema,
+        S:DepthSchema,
     },
     special_teams:{
         K:DepthSchema,
