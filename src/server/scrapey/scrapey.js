@@ -6,6 +6,7 @@ const cheerio = require('cheerio');
 const Promise = require('bluebird');
 const jsdom = require("jsdom");
 const moment = require("moment");
+const postal = require("postal");
 const reqprom = require("request-promise");
 
 const huddledb = require('../huddledb');
@@ -16,6 +17,8 @@ class Scrapey{
 
     constructor(){
         this.huddledb = huddledb;
+
+        this.message_channel = postal.channel("scrape");
 
         // Stub to be overwritten by child scraper classes
         this.scrape_settings = {};
@@ -51,6 +54,11 @@ class Scrapey{
         // Setup the scrape_settings for this scraper
         self.setup(scrape_options);
 
+        self.message_channel.publish("message", {
+                                text:"Scrape is now starting...",
+                                type:"danger"
+                            });
+
         // Dispatch the scraping (loop over the blocks of settings)
         _.each(self.scrape_settings, function(settings_subset){
             
@@ -59,7 +67,10 @@ class Scrapey{
                     .then(function(){
                         // Iterate over the url with the new array data from the db
                         return self.scrapeIterate(settings_subset).then(function(){
-                            callback_when_complete();
+                            self.message_channel.publish("complete", {
+                                text:"Scrape performed. Database column ammended. Data is now up-to-date.",
+                                type:"success"
+                            });
                         });
                     }); 
             } else {
@@ -67,7 +78,10 @@ class Scrapey{
                 if(settings_subset['options'].hasOwnProperty('iteration_vars')){
                     // Iterate over a url
                     return self.scrapeIterate(settings_subset).then(function(){
-                        callback_when_complete();
+                        self.message_channel.publish("complete", {
+                            text:"Scrape performed. Data is now up-to-date.",
+                            type:"success"
+                        });
                     });;
                 } else {
                     throw new Error("Scrapey:: Non iteration feature not supported.");
@@ -142,11 +156,20 @@ class Scrapey{
                     
                     if(self.shouldRunScrapey(settings_subset, url_obj, scrapeyCacheDBRow)){
                         console.log("Performing scrape on: " + url_obj['name']);
+                        self.message_channel.publish("message", {
+                            text:"Data out of date. Performing scrape on: " + url_obj['name'],
+                            type:"warning"
+                        });
 
                         // Returning another promise; no need to check .then()
                         return self.scrapeIt(settings_subset, url_obj, scrapeyCacheDBRow);
                     }
-                    console.log("Not running scrapey for some reason.");
+
+                    self.message_channel.publish("message", {
+                        text:"Data is up-to-date. No scrape performed.",
+                        type:"success"
+                    });
+                    
                     return true;
                 });
         }).catch(function(err){

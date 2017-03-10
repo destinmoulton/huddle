@@ -12,10 +12,18 @@ export default class TeamInfoInjuries extends React.Component{
         this.state = {
             roster: []
         };
+
+        this._isMounted = false;
     }
 
     componentDidMount(){
+        this._isMounted = true;
+
         this._scrape();
+    }
+
+    componentWillUnmount(){
+        this._isMounted = false;
     }
 
     /**
@@ -45,9 +53,11 @@ export default class TeamInfoInjuries extends React.Component{
         }
 
         huddlejax.query(query_params, (data)=>{
-            this.setState({
-                roster:data
-            });
+            if(this._isMounted){
+                this.setState({
+                    roster:data
+                });
+            }
         });
     }
 

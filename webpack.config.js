@@ -18,6 +18,13 @@ var config = {
                 loader: 'babel'
             }
         ]
+    },
+    externals: {
+        "postal": "postal",
+        "moment": "moment",
+        "react": "React",
+        "react-dom": "ReactDOM",
+        "react-router": "ReactRouter"
     }
 
 };

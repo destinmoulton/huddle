@@ -4,6 +4,8 @@
 
 import io from 'socket.io-client';
 
+import messenger from './messenger.js';
+
 class huddlejax {
     staticdata(request_params, callback){
         let socket = io('/staticdata');
@@ -29,14 +31,30 @@ class huddlejax {
 
     scrape(request_params, callback){
         let socket = io('/scrape');
+        let message_id = -1;
         socket.emit('begin:scrape', request_params);
         socket.on('response:scrape:started', function(){
-            console.log("Scrape started");
+            message_id = messenger.add({
+                text:"Checking if scrape is necessary...",
+                type:"info",
+                graphic:"animate",
+                persist:true
+            });
         });
-        socket.on('response:scrape:ended', function(){
-            console.log("Scrape complete");
+        socket.on('response:scrape:complete', function(message){
+            messenger.transform(message_id, {
+                text:message.text,
+                type:"success",
+                graphic:"checkmark",
+                end_persist:true
+            });
             callback();
         });
+
+        socket.on('response:scrape:message', function(message){
+            messenger.transform(message_id, message);
+        });
+        
     }
 }
 

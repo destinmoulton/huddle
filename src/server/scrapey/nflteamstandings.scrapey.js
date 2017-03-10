@@ -10,25 +10,46 @@ const NFLDivisions = require('../staticdata/nfldivisions.static');
 const Scrapey = require('./scrapey');
 
 class NFLTeamStandingsScraper extends Scrapey{
-    constructor(){
-        super();
 
-        let thisYear = new Date().getFullYear();
-        this.scrape_settings = [{
-            'name':'nflteamstandings',
-            'options':{
-                'scrape_type':'html',
-                'iteration_vars':{
-                    'year':{
-                        'type':'increment',
-                        'start':2007,
-                        'end':thisYear,
-                        'allowed_updates':[thisYear]
-                    }
-                },
-                'iteration_url':'http://www.nfl.com/standings?category=div&season=<year>-REG'
-            }
-        }];
+    setup(scrape_options){
+
+        if(scrape_options.hasOwnProperty('year')){
+
+            this.scrape_settings = [{
+                'name':'nflteamstandings',
+                'options':{
+                    'scrape_type':'html',
+                    'iteration_vars':{
+                        'year':{
+                            'type':'array',
+                            'allowed_updates':[scrape_options['year']],
+                            'array':[scrape_options['year']]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://www.nfl.com/standings?category=div&season=<year>-REG'
+                }
+            }];
+        } else {
+            // Increment through the years
+            let thisYear = new Date().getFullYear();
+            this.scrape_settings = [{
+                'name':'nflteamstandings',
+                'options':{
+                    'scrape_type':'html',
+                    'iteration_vars':{
+                        'year':{
+                            'type':'increment',
+                            'start':2007,
+                            'end':thisYear,
+                            'allowed_updates':[thisYear]
+                        }
+                    },
+                    'valid_timespan':'hour',
+                    'iteration_url':'http://www.nfl.com/standings?category=div&season=<year>-REG'
+                }
+            }];
+        }
     }
     
     parser(url_obj, page_data){

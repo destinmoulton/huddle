@@ -11,20 +11,27 @@ class DivisionTeamRows extends React.Component{
         super();
         this.state = {
             teamstandings:[]
-        };    
+        };
+
+        this._isMounted = false;
     }
 
 
     componentDidMount(){
-        this.loadDataFromServer(this.props);
+        this._isMounted = true;
+
+        this._loadStandingsFromServer(this.props);
+    }
+
+    componentWillUnmount(){
+        this._isMounted = false;
     }
     
-    componentWillReceiveProps( nextProps){
-        this.loadDataFromServer(nextProps);
+    componentWillReceiveProps(nextProps){
+        this._loadStandingsFromServer(nextProps);
     }
 
-
-    loadDataFromServer(props){
+    _loadStandingsFromServer(props){
         const request_params = {
             'model':'NFLTeamStandingsModel',
             'query_filters':{
@@ -35,9 +42,11 @@ class DivisionTeamRows extends React.Component{
         }
 
         huddlejax.query(request_params, (resp_data)=>{
-            this.setState({
-                teamstandings: resp_data
-            });
+            if(this._isMounted){
+                this.setState({
+                    teamstandings: resp_data
+                });
+            }
         });    
     
     }
@@ -48,8 +57,10 @@ class DivisionTeamRows extends React.Component{
                 {this.state.teamstandings.map(function(row){
                     return (
                             <tr key={row['_id']}>
-                                <td><Logo team_abbr={row['team_abbr']}/></td>
-                                <td><Link to={"/teaminfo/" + row.team_abbr}>{row['full_team_name']}</Link></td>
+                                <td>
+                                    <Logo team_abbr={row['team_abbr']}/>&nbsp;
+                                    <Link to={"/teaminfo/" + row.team_abbr}>{row['full_team_name']}</Link>
+                                </td>
                                 <td>{row['stats']['wins']}</td>
                                 <td>{row['stats']['losses']}</td>
                                 <td>{row['stats']['ties']}</td>

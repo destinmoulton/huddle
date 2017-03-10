@@ -11,10 +11,18 @@ export default class TeamDepthChart extends React.Component{
         this.state = {
             depthchart: []
         };
+
+        this._isMounted = false;
     }
 
     componentDidMount(){
+        this._isMounted = true;
+
         this._scrape();
+    }
+
+    componentWillUnmount(){
+        this._isMounted = false;
     }
     
     /**
@@ -44,9 +52,11 @@ export default class TeamDepthChart extends React.Component{
         }
 
         huddlejax.query(query_params, (data)=>{
-            this.setState({
-                depthchart:data[0]
-            });
+            if(this._isMounted){
+                this.setState({
+                    depthchart:data[0]
+                });
+            }
         });
     }
 

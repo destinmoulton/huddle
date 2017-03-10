@@ -19,37 +19,53 @@ class TeamStandings extends React.Component {
         for(let i=2007; i<=current_year; i++){
             this.years_array.push(i);
         }
+
+        this._isMounted = false;
     }
 
     componentDidMount(){
-        this._loadDataFromServer();
+        this._isMounted = true;
+
+        this._scrapeTeamStandings();
     }
 
-    _loadDataFromServer(){
-        const request_data = {
+    componentWillUnmount(){
+        this._isMounted = false;
+    }
+
+    _scrapeTeamStandings(props){
+        const scrape_options = {
+            'scraper':'NFLTeamStandings',
+            options: {
+                'year': this.state.year
+            }
+        };
+        huddlejax.scrape(scrape_options, ()=>{
+            // Reload the data
+            this._loadDivisionsFromServer();
+        });
+    }
+
+    _loadDivisionsFromServer(){
+        const request_options = {
             'staticdata_id':'NFLDivisions'
         };
 
-        huddlejax.staticdata(request_data, (resp_data)=>{
-            this.setState({
-                divisions: resp_data
-            });
-        });
-    }
-
-    _scrapeTeamStandings(){
-        const self = this;
-        const request_data = {
-            'scraper':'NFLTeamStandings'
-        };
-        huddlejax.scrape(request_data, ()=>{
-            // Reload the data
-            self._loadDataFromServer();
+        huddlejax.staticdata(request_options, (resp_data)=>{
+            if(this._isMounted){
+                this.setState({
+                    divisions: resp_data
+                });
+            }
         });
     }
     
-    // The select box event fires
-    selectChangeYear(e){
+    /**
+     * The event call when the year select box is changed
+     * 
+     * @param {event} e - The select box event
+     */
+    _selectChangeYear(e){
         this.setState({year:e.target.value});
     }
 
@@ -57,8 +73,7 @@ class TeamStandings extends React.Component {
         return (
             <div>
                 <h1>Team Standings</h1>
-                <button className='btn' onClick={this._scrapeTeamStandings.bind(this)}>Scrape</button>
-                <select id='select-team-standing-year' defaultValue={this.state.year} onChange={this.selectChangeYear.bind(this)}>
+                <select id='select-team-standing-year' defaultValue={this.state.year} onChange={this._selectChangeYear.bind(this)}>
                     {this.years_array.map(function(year){ 
                         return (<option key={year}>{year}</option>);
                     })}
