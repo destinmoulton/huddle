@@ -5,6 +5,7 @@ Huddle is an NFL Web Scraper. It scrapes the NFL website and presents a view of 
 
 Huddle is built using node and React.
 
+### Compiling and Startin the Webserver
 To start the web server:
   $ npm run-script startserver
 
