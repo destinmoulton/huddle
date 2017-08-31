@@ -1,0 +1,15 @@
+{
+  "apps" : [
+  {
+    "name"        : "huddle",
+    "script"      : "bin/www",
+    "watch"       : ["dist/server"],
+    "node-args"   : "--inspect",
+    "env": {
+      "NODE_ENV": "development"
+    },
+    "env_production" : {
+       "NODE_ENV": "production"
+    }
+  }]
+}
