@@ -17,17 +17,17 @@ Huddle is composed of two elements:
 
 To start the web server:
 ```sh
-  $ npm run-script startserver
+  $ npm run start:server
 ```
 
 To compile the server source (./src/server) into (./dist/server):
 ```sh
-  $ npm run-script compileserver
+  $ npm run compile:server
 ```
 
 To compile the client (./src/client) into (./public/js/client/huddle.react.js):
 ```sh
-  $ npm run-script compileclient
+  $ npm run compile:client
 ```
 Webpack configuration is stored in ./webpack.config.js
 
