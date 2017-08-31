@@ -19,6 +19,7 @@ To start the web server:
 ```sh
   $ npm run start:server
 ```
+The server uses pm2 for persistence. The pm2 configuration file is ./pm2.config.json.
 
 To compile the server source (./src/server) into (./dist/server):
 ```sh
