@@ -1,1 +1,29 @@
-{% extends "layouts/base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	    <meta charset="utf-8">
+	    <title>{{ title }}</title>
+
+	    <!--[if IE]>
+		    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	    <![endif]-->
+        <link rel="stylesheet" type="text/css" href="/vendors/bootstrap-3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/simplex/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/vendors/font-awesome-4.6.3/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/main.css">
+    </head>
+
+    <body>
+        <div id="container"></div>
+        <script src="/js/bootstrap-native.min.js"></script>
+        <script src="/vendors/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+        <script src="/js/lodash.min.js"></script>
+        <script src="/js/postal.min.js"></script>
+        <script src="/js/moment.min.js"></script>
+        
+        <script src="/vendors/react-15.3.2/build/react.js"></script>
+        <script src="/vendors/react-15.3.2/build/react-dom.min.js"></script>
+        <script src="/js/ReactRouter.min.js"></script>
+        <script src="/client/huddle.react.js"></script>
+    </body>
+</html>
