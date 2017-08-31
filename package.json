@@ -4,9 +4,9 @@
   "description": "A football survivor analysis tool.",
   "main": "app.js",
   "scripts": {
-    "startserver": "nodemon -e js,html --watch dist/server ./bin/www",
-    "compileserver": "babel src/server --watch --out-dir dist/server",
-    "compileclient": "webpack --config webpack.config.js -d --watch ",
+    "start:server": "nodemon -e js,html --watch dist/server ./bin/www",
+    "compile:server": "babel src/server --watch --out-dir dist/server",
+    "compile:client": "webpack --config webpack.config.js -d --watch ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Destin Moulton",
