@@ -4,7 +4,7 @@
   "description": "A football survivor analysis tool.",
   "main": "app.js",
   "scripts": {
-    "start:server": "nodemon -e js,html --watch dist/server ./bin/www",
+    "start:server": "pm2 start pm2.config.json",
     "compile:server": "babel src/server --watch --out-dir dist/server",
     "compile:client": "webpack --config webpack.config.js -d --watch ",
     "test": "echo \"Error: no test specified\" && exit 1"
